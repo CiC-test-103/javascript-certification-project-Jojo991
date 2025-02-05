@@ -3,6 +3,15 @@ const LinkedList = require('./LinkedList');  // Import LinkedList class
 const Student = require('./Student');        // Import Student class
 const fs = require('fs');
 
+// Helper to create mock students
+function createMockStudents() {
+  return [
+    new Student('AliceJohnson', 2, 'alice@example.com', 'computerScience'),
+    new Student('BobSmith', 3, 'bob@example.com', 'Engineering'),
+    new Student('CharlieBrown', 4, 'charlie@example.com', 'Mathematics'),
+  ];
+}
+
 // Initialize a new LinkedList instance before each test
 let linkedList;
 
@@ -12,27 +21,18 @@ beforeEach(() => {
 
 // Test adding and displaying students
 test('Adding and displaying students', () => {
-  const student1 = new Student('AliceJohnson', 2022, 'alice@example.com', 'computerScience');
-  const student2 = new Student('BobSmith', 2022, 'bob@example.com', 'mathematics');
-  const student3 = new Student('CharlieBrown', 2023, 'charlie@example.com', 'computerScience');
+  const students = createMockStudents();
+  students.forEach(student => linkedList.addStudent(student));
 
-  linkedList.addStudent(student1);
-  linkedList.addStudent(student2);
-  linkedList.addStudent(student3);
-
-  const allStudents = linkedList.displayStudents();
-  expect(allStudents).toEqual('AliceJohnson, BobSmith, CharlieBrown');  // Test the names of the students
+  expect(linkedList.displayStudents()).toBe('AliceJohnson, BobSmith, CharlieBrown');
+  expect(linkedList.length).toBe(3);
 });
 
 // Test filtering students by specialization
 test('Filtering by specialization', () => {
-  const student1 = new Student('AliceJohnson', 2022, 'alice@example.com', 'computerScience');
-  const student2 = new Student('BobSmith', 2022, 'bob@example.com', 'mathematics');
-  const student3 = new Student('CharlieBrown', 2023, 'charlie@example.com', 'computerScience');
-
-  linkedList.addStudent(student1);
-  linkedList.addStudent(student2);
-  linkedList.addStudent(student3);
+  const students = createMockStudents();
+  students[2].setSpecialization('computerScience'); // Change Charlie's specialization to match Alice
+  students.forEach(student => linkedList.addStudent(student));
 
   const filtered = linkedList.filterBySpecialization('computerScience');
   expect(filtered.length).toBe(2);
@@ -40,28 +40,46 @@ test('Filtering by specialization', () => {
 });
 
 // Test saving and loading from JSON
-test('Saving and loading from JSON', () => {
-  const student1 = new Student('AliceJohnson', 2022, 'alice@example.com', 'computerScience');
-  const student2 = new Student('BobSmith', 2022, 'bob@example.com', 'mathematics');
-  const student3 = new Student('CharlieBrown', 2023, 'charlie@example.com', 'computerScience');
+test('Saving and loading from JSON', async () => {
+  const fs = require('fs/promises');
+  const students = createMockStudents();
+  students.forEach(student => linkedList.addStudent(student));
 
-  linkedList.addStudent(student1);
-  linkedList.addStudent(student2);
-  linkedList.addStudent(student3);
+  const fileName = 'test_students.json';
+  await linkedList.saveToJson(fileName);
 
-  const fileName = 'students.json';
-  linkedList.saveToJSON(fileName);
+  const newLinkedList = new LinkedList();
+  await newLinkedList.loadFromJSON(fileName);
 
-  // Create a new LinkedList to load from the saved file
-  let newLinkedList = new LinkedList();
-  newLinkedList.loadFromJSON(fileName);
+  expect(newLinkedList.displayStudents()).toBe('AliceJohnson, BobSmith, CharlieBrown');
+  expect(newLinkedList.length).toBe(3);
 
-  const allStudents = newLinkedList.displayStudents();
-  expect(allStudents).toEqual('AliceJohnson, BobSmith, CharlieBrown');  // Check if the students are loaded correctly
-  expect(newLinkedList.head).not.toBeNull();  // Ensure the list is not empty
-
-  // Clean up: remove the test JSON file
-  fs.unlinkSync(fileName);
+  await fs.unlink(fileName); // Clean up
 });
 
-// Additional tests for other methods (remove, find, etc.) can be added here as needed
+// Test finding a student by email
+test('Finding a student by email', () => {
+  const students = createMockStudents();
+  students.forEach(student => linkedList.addStudent(student));
+
+  const foundStudent = linkedList.findStudent('bob@example.com');
+  expect(foundStudent).not.toBe(-1);
+  expect(foundStudent.getName()).toBe('BobSmith');
+
+  const notFound = linkedList.findStudent('nonexistent@example.com');
+  expect(notFound).toBe(-1);
+});
+
+// Test removing a student by email
+test('Removing a student by email', () => {
+  const students = createMockStudents();
+  students.forEach(student => linkedList.addStudent(student));
+
+  linkedList.removeStudent('bob@example.com');
+  expect(linkedList.displayStudents()).toBe('AliceJohnson, CharlieBrown');
+  expect(linkedList.length).toBe(2);
+
+  linkedList.removeStudent('alice@example.com');
+  expect(linkedList.displayStudents()).toBe('CharlieBrown');
+  expect(linkedList.length).toBe(1);
+});
