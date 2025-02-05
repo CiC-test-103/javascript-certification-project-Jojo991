@@ -1,5 +1,5 @@
-// LinkedList class to manage students in a linked list
-const Student = require('./Student'); // Import Student class
+// Import the full Student class (no destructuring)
+const Student = require('./Student');  // Correct import without destructuring
 
 class LinkedList {
   constructor() {
@@ -7,7 +7,7 @@ class LinkedList {
     this.length = 0;
   }
 
-  // Method to add a student to the linked list
+  // Add a student to the linked list
   addStudent(student) {
     const newNode = {
       student,
@@ -26,7 +26,7 @@ class LinkedList {
     this.length++;
   }
 
-  // Method to display students in the linked list
+  // Display all student names in the linked list
   displayStudents() {
     let current = this.head;
     let studentNames = [];
@@ -37,7 +37,7 @@ class LinkedList {
     return studentNames.join(', ');
   }
 
-  // Method to filter students by specialization
+  // Filter students by specialization
   filterBySpecialization(specialization) {
     let current = this.head;
     let result = [];
@@ -50,7 +50,7 @@ class LinkedList {
     return result;
   }
 
-  // Method to save students to a JSON file
+  // Save students to a JSON file
   async saveToJson(fileName) {
     const fs = require('fs').promises;
     const studentsData = [];
@@ -68,7 +68,7 @@ class LinkedList {
     await fs.writeFile(fileName, JSON.stringify(studentsData, null, 2));
   }
 
-  // Method to load students from a JSON file
+  // Load students from a JSON file
   async loadFromJSON(fileName) {
     const fs = require('fs').promises;
     const studentsData = JSON.parse(await fs.readFile(fileName, 'utf-8'));
@@ -83,7 +83,7 @@ class LinkedList {
     });
   }
 
-  // Method to find a student by their email
+  // Find a student by email
   findStudent(email) {
     let current = this.head;
     while (current) {
@@ -92,10 +92,10 @@ class LinkedList {
       }
       current = current.next;
     }
-    return -1; // Return -1 if the student is not found
+    return -1;  // Student not found
   }
 
-  // Method to remove a student by email
+  // Remove a student by email
   removeStudent(email) {
     if (this.head === null) return;
 
