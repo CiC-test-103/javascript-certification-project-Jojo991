@@ -1,31 +1,46 @@
-// Student.js
-
-// Student class with a constructor and getter methods
+// Student class with private fields and getter methods
 class Student {
+  // Private Fields
+  #name;               // String (full name with no space in between)
+  #year;               // Number
+  #email;              // String
+  #specialization;     // String (must be written in camelCase)
+
   constructor(name, year, email, specialization) {
-    this.name = name;
-    this.year = year;
-    this.email = email;
-    this.specialization = specialization;
+    this.#name = name;
+    this.#year = year;
+    this.#email = email;
+    this.#specialization = specialization;
   }
 
-  // Getter methods
   getName() {
-    return this.name;
+    return this.#name;
   }
 
   getYear() {
-    return this.year;
+    return this.#year;
   }
 
   getEmail() {
-    return this.email;
+    return this.#email;
   }
 
   getSpecialization() {
-    return this.specialization;
+    return this.#specialization; 
+  }
+
+  getString() {
+    return `Name: ${this.#name}, Year: ${this.#year}, Email: ${this.#email}, Specialization: ${this.#specialization}`;
+  }
+
+  setEmail(newEmail) {
+    this.#email = newEmail;
+  }
+
+  setSpecialization(newSpecialization) {
+    this.#specialization = newSpecialization;
   }
 }
 
-// Correct export syntax
-module.exports = Student;  // EXPORTING ONLY ONCE, THIS IS CORRECT
+// Export the class using the correct syntax
+module.exports = { Student };
